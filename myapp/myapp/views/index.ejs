@@ -1,67 +1,67 @@
 <!DOCTYPE html>
 <html>
-  <head>
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
-	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-  </head>
+<head>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css"/>
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
 
 <body>
 
 <div data-role="page">
 
-	<div data-role="header">
-		<h1>Page Title</h1>
-	</div><!-- /header -->
+    <div data-role="header">
+        <h1>Page Title</h1>
+    </div><!-- /header -->
 
-	<div role="main" class="ui-content">
-		<p>Register</p>
-		
-		Username  <input type="text" id="username" name="username"/>
-		<br>
-		
-		Password  <input type="text" id="password" name="password"/>
-		<br>
-		
-		email  <input type="text" id="email" name="email"/>
-		<br>
-		
-		
-		<button id="register"> Register </button>
-		
-		<div id="output"> </div>
-		
-		<script>
-		$( "#register" ).click(function() {
-			
-			// Get the values
-			var un = $('#username').val();
-			
-			var pw = $('#password').val();
-			
-			var email = $('#email').val();
-			
-			
-			if(un == ''){
-			    alert("too short");
-			} else {
-			
-						// Send the data
-						$.post( "/login", { username: un, password:pw, email:email })
-						  .done(function( data ) {
-								
-							    alert("Sent!");
-					    });
-					}
-			
-		});
-		</script>
-		
-	</div><!-- /content -->
+    <div role="main" class="ui-content">
+        <p>Register</p>
 
-	<div data-role="footer">
-		<h4>Page Footer</h4>
-	</div><!-- /footer -->
+        Username <input type="text" id="username" name="username"/>
+        <br>
+
+        Password <input type="text" id="password" name="password"/>
+        <br>
+
+        email <input type="text" id="email" name="email"/>
+        <br>
+
+
+        <button id="register"> Register</button>
+
+        <div id="output"></div>
+
+        <script>
+            $("#register").click(function () {
+
+                // Get the values
+                var un = $('#username').val();
+
+                var pw = $('#password').val();
+
+                var email = $('#email').val();
+
+
+                if (un == '') {
+                    alert("too short");
+                } else {
+
+                    // Send the data
+                    $.post("/login", {username: un, password: pw, email: email})
+                        .done(function (data) {
+
+                            alert("Sent!");
+                        });
+                }
+
+            });
+        </script>
+
+    </div><!-- /content -->
+
+    <div data-role="footer">
+        <h4>Page Footer</h4>
+    </div><!-- /footer -->
 </div><!-- /page -->
-  </body>
+</body>
 </html>
