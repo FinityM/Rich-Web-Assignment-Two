@@ -59,15 +59,15 @@ app.post('/login', function (req, res) {
     var mysql = require('mysql');
     var connection = mysql.createConnection({
         host: 'localhost',
-        user: 'root',
-        password: 'SQLpass',
-        database: 'test'
+        user: '',
+        password: '',
+        database: 'assignment_two'
     });
 
     connection.connect();
 
     // This is the actual SQL query part
-    connection.query("INSERT INTO `test`.`login` (`username`, `password`, `email`) VALUES ('" + username + "', '" + password + "', '" + email + "');", function (error, results, fields) {
+    connection.query("INSERT INTO `assignment_two`.`login` (`username`, `password`, `email`) VALUES ('" + username + "', '" + password + "', '" + email + "');", function (error, results, fields) {
         if (error) throw error;
 
 
