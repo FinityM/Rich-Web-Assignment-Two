@@ -23,7 +23,7 @@
         Password <input type="text" id="password" name="password"/>
         <br>
 
-        email <input type="text" id="email" name="email"/>
+        Email <input type="text" id="email" name="email"/>
         <br>
 
 
@@ -42,7 +42,7 @@
                 var email = $('#email').val();
 
 
-                if (un == '') {
+                if (un == '' || pw == '' || email == '') {
                     alert("too short");
                 } else {
 

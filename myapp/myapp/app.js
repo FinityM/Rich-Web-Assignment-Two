@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var validator = require('validator');
-
+var evalidator = require('email-validator');
 
 var indexRouter = require('./routes/index');
 // import
@@ -13,6 +13,8 @@ var indexRouter2 = require('./routes/index2');
 
 
 var usersRouter = require('./routes/users');
+const mysql = require("mysql");
+const has = require("has-value");
 
 var app = express();
 
@@ -41,6 +43,7 @@ app.get('/login', function (req, res) {
 
 });
 
+
 app.post('/login', function (req, res) {
 
     // catch the username that was sent to us from the jQuery POST on the index.ejs page
@@ -48,35 +51,69 @@ app.post('/login', function (req, res) {
     var password = req.body.password;
     var email = req.body.email;
 
+    var errorMessage = '';
+
+    // Validate the email
+    var result = evalidator.validate(email);
+
+    // Validate the username
+    const has = require('has-value');
+    var hasValue = has(username);
+    let n = username.search("^[a-zA-Z0-9_.-]*$");
+    console.log(n);
+
+    // Validate the password
+    const bcrypt = require('bcrypt');
+    const saltRounds = 15;
+    const myPlainTextPassword = password + 'tudublin';
+
+    if (result == false || result == null || result == '' || !result) {
+        errorMessage += 'Email not valid <br>';
+    }
+
+    if (hasValue == false) {
+        errorMessage += 'Username left empty <br>';
+    }
+
     // Print it out to the NodeJS console just to see if we got the variable.
     console.log("User name = " + username);
     console.log("Password = " + password);
     console.log("Email = " + email);
 
-
-    // Remember to check what database you are connecting to and if the
-    // values are correct.
-    var mysql = require('mysql');
-    var connection = mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'assignment_two'
+    // Hash and print the hashed password to the console
+    bcrypt.hash(myPlainTextPassword, saltRounds, function(err, hash){
+        // Store hash in password
+        console.log(hash);
     });
 
-    connection.connect();
+    if (errorMessage == '') {
+        // Remember to check what database you are connecting to and if the
+        // values are correct.
+        var mysql = require('mysql');
+        var connection = mysql.createConnection({
+            host: 'localhost',
+            user: 'root',
+            password: '',
+            database: 'assignment_two'
+        });
 
-    // This is the actual SQL query part
-    connection.query("INSERT INTO `assignment_two`.`login` (`username`, `password`, `email`) VALUES ('" + username + "', '" + password + "', '" + email + "');", function (error, results, fields) {
-        if (error) throw error;
+        connection.connect();
 
+        // This is the actual SQL query part
+        connection.query("INSERT INTO `assignment_two`.`login` (`username`, `password`, `email`) VALUES ('" + username + "', '" + password + "', '" + email + "');", function (error, results, fields) {
+            if (error) throw error;
 
-    });
+        });
 
-    connection.end();
+        connection.end();
 
+        res.send("received");
 
-    res.send("received");
+    } else {
+        // if there is an error
+        res.send(errorMessage);
+    }
+
 });
 
 
