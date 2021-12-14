@@ -82,7 +82,7 @@ app.post('/login', function (req, res) {
     console.log("Email = " + email);
 
     // Hash and print the hashed password to the console
-    const securepass = bcrypt.hash(myPlainTextPassword, saltRounds, function(err, hash){
+   bcrypt.hash(myPlainTextPassword, saltRounds, function(err, hash){
         // Store hash in password
         console.log(hash);
     });
