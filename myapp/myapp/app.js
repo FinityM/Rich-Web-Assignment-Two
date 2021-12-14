@@ -66,7 +66,7 @@ app.post('/login', function (req, res) {
     // Validate the password
     const bcrypt = require('bcrypt');
     const saltRounds = 15;
-    const myPlainTextPassword = password + 'tudublin';
+    const myPlainTextPassword = password;
 
     if (result == false || result == null || result == '' || !result) {
         errorMessage += 'Email not valid <br>';
@@ -77,18 +77,11 @@ app.post('/login', function (req, res) {
     }
 
     // Print it out to the NodeJS console just to see if we got the variable.
-    console.log("User name = " + username);
-    console.log("Password = " + password);
-    console.log("Email = " + email);
-
-    // Hash and print the hashed password to the console
-    bcrypt.hash(myPlainTextPassword, saltRounds, function (err, hash) {
-        // Store hash in password
-        console.log(hash);
-    });
+    // console.log("User name = " + username);
+    // console.log("Password = " + password);
+    // console.log("Email = " + email);
 
     if (result) {
-
         // Remember to check what database you are connecting to and if the
         // values are correct.
         var mysql = require('mysql');
@@ -99,20 +92,23 @@ app.post('/login', function (req, res) {
             database: 'assignment_two'
         });
 
-        connection.connect();
+        // Hash and print the hashed password to the console
+        bcrypt.hash(myPlainTextPassword, saltRounds, function (err, hash) {
+            connection.connect();
 
-        // This is the actual SQL query part
-        connection.query("INSERT INTO `assignment_two`.`login` (`username`, `password`, `email`) VALUES ('" + username + "', '" + password + "', '" + email + "');", function (error, results, fields) {
-            if (error) throw error;
+            // This is the actual SQL query part
+            connection.query("INSERT INTO `assignment_two`.`login` (`username`, `password`, `email`) VALUES ('" + username + "', '" + hash + "', '" + email + "');", function (error, results, fields) {
+                if (error) {
+                    res.send(error.code);
+                } else res.send('received');
+            });
+
+            // Store hash in password
+            console.log(hash);
+            connection.end();
 
         });
-
-        connection.end();
-
-        res.send("received");
-
     } else {
-        // if there is an error
         res.send(errorMessage);
     }
 
@@ -134,6 +130,5 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error');
 });
-
 
 module.exports = app;
