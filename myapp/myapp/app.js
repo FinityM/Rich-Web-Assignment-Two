@@ -15,6 +15,7 @@ var indexRouter2 = require('./routes/index2');
 var usersRouter = require('./routes/users');
 const mysql = require("mysql");
 const has = require("has-value");
+const bcrypt = require("bcrypt");
 
 var app = express();
 
@@ -53,40 +54,40 @@ app.post('/login', function (req, res) {
 
     var errorMessage = '';
 
-    // Validate the email
-    var result = evalidator.validate(email);
-
-    // Validate the username
-    const has = require('has-value');
-    var hasValue = has(username);
-    let n = username.search("^[a-zA-Z0-9_.-]*$");
-    console.log(n);
-
-    // Validate the password
-    const bcrypt = require('bcrypt');
-    const saltRounds = 15;
-    const myPlainTextPassword = password + 'tudublin';
-
-    if (result == false || result == null || result == '' || !result) {
-        errorMessage += 'Email not valid <br>';
-    }
-
-    if (hasValue == false) {
-        errorMessage += 'Username left empty <br>';
-    }
-
-    // Print it out to the NodeJS console just to see if we got the variable.
-    console.log("User name = " + username);
-    console.log("Password = " + password);
-    console.log("Email = " + email);
-
-    // Hash and print the hashed password to the console
-    bcrypt.hash(myPlainTextPassword, saltRounds, function(err, hash){
-        // Store hash in password
-        console.log(hash);
-    });
-
     if (errorMessage == '') {
+        // Validate the email
+        var result = evalidator.validate(email);
+
+        // Validate the username
+        const has = require('has-value');
+        var hasValue = has(username);
+        let n = username.search("^[a-zA-Z0-9_.-]*$");
+        console.log(n);
+
+        // Validate the password
+        const bcrypt = require('bcrypt');
+        const saltRounds = 15;
+        const myPlainTextPassword = password + 'tudublin';
+
+        if (result == false || result == null || result == '' || !result) {
+            errorMessage += 'Email not valid <br>';
+        }
+
+        if (hasValue == false) {
+            errorMessage += 'Username left empty <br>';
+        }
+
+        // Print it out to the NodeJS console just to see if we got the variable.
+        console.log("User name = " + username);
+        console.log("Password = " + password);
+        console.log("Email = " + email);
+
+        // Hash and print the hashed password to the console
+        bcrypt.hash(myPlainTextPassword, saltRounds, function(err, hash){
+            // Store hash in password
+            console.log(hash);
+        });
+
         // Remember to check what database you are connecting to and if the
         // values are correct.
         var mysql = require('mysql');
