@@ -16,6 +16,7 @@ var usersRouter = require('./routes/users');
 const mysql = require("mysql");
 const has = require("has-value");
 const bcrypt = require("bcrypt");
+const sqlstring = require("sqlstring");
 
 var app = express();
 
@@ -63,6 +64,17 @@ app.post('/login', function (req, res) {
 
     var errorMessage = '';
 
+    // SQL sanitisation
+    var sqlstring = require('sqlstring');
+
+    var sqlusername = sqlstring.escape(username);
+    var sqlemail = sqlstring.escape(email);
+    var sqlpass = sqlstring.escape(password);
+
+    console.log("es SQL attack username: " + sqlusername);
+    console.log("es SQL attack email: " + sqlemail);
+    console.log("es SQL attack pass: " + sqlpass);
+
     // Validate the email
     var result = evalidator.validate(email);
 
@@ -75,22 +87,28 @@ app.post('/login', function (req, res) {
     // Validate the password
     const bcrypt = require('bcrypt');
     const saltRounds = 15;
-    const myPlainTextPassword = password;
 
     if (result == false || result == null || result == '' || !result) {
+        alert('Email is empty\n');
         errorMessage += 'Email not valid <br>';
     }
 
     if (hasValue == false) {
+        alert('Username is empty\n');
         errorMessage += 'Username left empty <br>';
     }
+
+    // Username sanitisation
+    var xss = require("xss");
+    var cleanedUsername = xss(username);
+    console.log(cleanedUsername);
 
     // Print it out to the NodeJS console just to see if we got the variable.
     // console.log("User name = " + username);
     // console.log("Password = " + password);
     // console.log("Email = " + email);
 
-    if (result) {
+    if (errorMessage.length == 0) {
         // Remember to check what database you are connecting to and if the
         // values are correct.
         var mysql = require('mysql');
@@ -102,11 +120,11 @@ app.post('/login', function (req, res) {
         });
 
         // Hash and print the hashed password to the console
-        bcrypt.hash(myPlainTextPassword, saltRounds, function (err, hash) {
+        bcrypt.hash(sqlpass, saltRounds, function (err, hash) {
             connection.connect();
 
             // This is the actual SQL query part
-            connection.query("INSERT INTO `assignment_two`.`login` (`username`, `password`, `email`) VALUES ('" + username + "', '" + hash + "', '" + email + "');", function (error, results, fields) {
+            connection.query("INSERT INTO `assignment_two`.`login` (`username`, `password`, `email`) VALUES ('" + sqlusername + "', '" + hash + "', '" + sqlemail + "');", function (error, results, fields) {
                 if (error) {
                     res.send(error.code);
                 } else res.send('received');
