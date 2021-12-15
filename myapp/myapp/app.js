@@ -52,6 +52,15 @@ app.post('/login', function (req, res) {
     var password = req.body.password;
     var email = req.body.email;
 
+    // Other email validator
+    // var em = require('is-email');
+    //
+    // em.isEmail('is-email');
+    //
+    // var r1 = em.isEmail(email);
+    //
+    // console.log("email not valid" + r1);
+
     var errorMessage = '';
 
     // Validate the email
