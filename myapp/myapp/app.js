@@ -4,15 +4,12 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var validator = require('validator');
-
-
 var indexRouter = require('./routes/index');
 // import
 var indexRouter2 = require('./routes/index2');
 
-
 var usersRouter = require('./routes/users');
+const mysql = require("mysql");
 
 var app = express();
 
@@ -48,31 +45,50 @@ app.post('/login', function (req, res) {
     var password = req.body.password;
     var email = req.body.email;
 
+    var errorMessage = '';
+
+    // Sanitisation and validation
+    var validator = require('validator');
+    var emailValid = validator.isEmail(email); // true or false
+
+    if (emailValid == false){
+        errorMessage += 'Email not valid \n';
+        console.log(errorMessage);
+    }
+
+    // If there is an error
+    if (errorMessage.length > 0) {
+        res.send(errorMessage);
+    } else {
+        // DB insert statement
+        // Remember to check what database you are connecting to and if the
+        // values are correct.
+        var mysql = require('mysql');
+        var connection = mysql.createConnection({
+            host: 'localhost',
+            user: 'root',
+            password: '',
+            database: 'assignment_two'
+        });
+
+        connection.connect();
+
+        // This is the actual SQL query part
+        connection.query("INSERT INTO `assignment_two`.`login` (`username`, `password`, `email`) VALUES ('" + username + "', '" + password + "', '" + email + "');", function (error, results, fields) {
+            if (error) throw error;
+        });
+
+        connection.end();
+
+        res.send("All ok");
+    }
+
     // Print it out to the NodeJS console just to see if we got the variable.
     console.log("User name = " + username);
     console.log("Password = " + password);
     console.log("Email = " + email);
 
-    // Remember to check what database you are connecting to and if the
-    // values are correct.
-    var mysql = require('mysql');
-    var connection = mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'assignment_two'
-    });
 
-    connection.connect();
-
-    // This is the actual SQL query part
-    connection.query("INSERT INTO `assignment_two`.`login` (`username`, `password`, `email`) VALUES ('" + username + "', '" + password + "', '" + email + "');", function (error, results, fields) {
-        if (error) throw error;
-    });
-
-    connection.end();
-
-    res.send("received");
 });
 
 

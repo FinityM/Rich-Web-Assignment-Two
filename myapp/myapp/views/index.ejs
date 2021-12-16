@@ -42,15 +42,14 @@
                 var email = $('#email').val();
 
 
-                if (un == '' || pw == '' || email == '') {
-                    alert("Invalid or illegal input");
+                if (un == '' || un.length < 1 || pw == '' || pw.length < 1 || email == '' || email.length < 1) {
+                    alert("Too short");
                 } else {
 
                     // Send the data
                     $.post("/login", {username: un, password: pw, email: email})
                         .done(function (data) {
-
-                            alert("Sent!");
+                            alert(data);
                         });
                 }
 
