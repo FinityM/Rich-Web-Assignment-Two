@@ -9,7 +9,7 @@ var indexRouter = require('./routes/index');
 var indexRouter2 = require('./routes/index2');
 
 var usersRouter = require('./routes/users');
-const mysql = require("mysql");
+const jsesc = require("jsesc");
 
 var app = express();
 
@@ -51,10 +51,27 @@ app.post('/login', function (req, res) {
     var validator = require('validator');
     var emailValid = validator.isEmail(email); // true or false
 
-    if (emailValid == false){
+    if (emailValid == false) {
         errorMessage += 'Email not valid \n';
         console.log(errorMessage);
     }
+
+    var xss = require("xss");
+    var scriptcleanedUsername = xss(username);
+    var scriptcleanedEmail = xss(email);
+    console.log(scriptcleanedUsername);
+
+    var SqlString = require('sqlstring');
+    var sqlUsernameCleaned = SqlString.escape(scriptcleanedUsername);
+    var sqlEmailCleaned = SqlString.escape(scriptcleanedEmail);
+    console.log(sqlUsernameCleaned);
+    console.log(sqlEmailCleaned);
+
+    const jsesc = require('jsesc');
+    var finalCleanUn = jsesc(sqlUsernameCleaned);
+    var finalCleanEmail = jsesc(sqlEmailCleaned);
+    console.log(finalCleanUn);
+    console.log(finalCleanEmail);
 
     // If there is an error
     if (errorMessage.length > 0) {
@@ -63,22 +80,32 @@ app.post('/login', function (req, res) {
         // DB insert statement
         // Remember to check what database you are connecting to and if the
         // values are correct.
-        var mysql = require('mysql');
-        var connection = mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            password: '',
-            database: 'assignment_two'
+
+        const bcrypt = require('bcrypt');
+        const saltRounds = 10;
+
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const hash = bcrypt.hashSync(password, saltRounds);
+
+        //Bcrypt the password
+        bcrypt.hash(password, salt, function (errorMessage, hash) {
+            var mysql = require('mysql');
+            var connection = mysql.createConnection({
+                host: 'localhost',
+                user: 'root',
+                password: '',
+                database: 'assignment_two'
+            });
+
+            connection.connect();
+
+            // This is the actual SQL query part
+            connection.query("INSERT INTO `assignment_two`.`login` (`username`, `password`, `email`) VALUES ('" + finalCleanUn + "', '" + hash + "', '" + finalCleanEmail + "');", function (error, results, fields) {
+                if (error) throw error;
+            });
+
+            connection.end();
         });
-
-        connection.connect();
-
-        // This is the actual SQL query part
-        connection.query("INSERT INTO `assignment_two`.`login` (`username`, `password`, `email`) VALUES ('" + username + "', '" + password + "', '" + email + "');", function (error, results, fields) {
-            if (error) throw error;
-        });
-
-        connection.end();
 
         res.send("All ok");
     }
